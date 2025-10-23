@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>SinapsCore · Código Infarto</title>
+  <meta name="description" content="Planificador con checklist para fibrinólisis (TNK) en Código Infarto. Calcula dosis, rutas y cronograma."/>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Exo+2:wght@400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css" />
+  <link rel="apple-touch-icon" sizes="180x180" href="apple_touch_icon_180.png">
+  <link rel="icon" href="favicon.jpeg" type="image/jpeg">
+  <link rel="manifest" href="site.webmanifest">
+  <meta name="theme-color" content="#0b0e13">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="color-scheme" content="light dark">
+</head>
+<body>
+  <header class="app-header">
+    <div class="brand">
+      <img id="brandLogo" alt="SinapsCore" src="ios_app_icon_1024.png" />
+      <div class="brand-txt">
+        <h1>SinapsCore</h1>
+        <p class="tagline">Salud Conectada. IA en el Núcleo</p>
+      </div>
+    </div>
+    <div class="meta">
+      <span class="badge">Código Infarto · Fibrinólisis (TNK)</span>
+      <button id="checklistToggle" aria-pressed="false" title="Modo solo checklist">Checklist</button>
+      <button id="darkToggle" aria-label="Cambiar tema" title="Tema: auto/dark/light">Modo</button>
+      <button id="brandSettingsBtn" aria-label="Ajustes de marca" title="Ajustes de marca">Brand</button>
+    </div>
+  </header>
+
+  <div id="printHeader" class="print-header" aria-hidden="true">
+    <div class="ph-left">
+      <img id="printHeaderLogo" alt="SinapsCore" />
+      <div class="ph-txt">
+        <div class="ph-title">Código Infarto · Fibrinólisis (TNK)</div>
+        <div class="ph-sub">Resumen de administración y evolución</div>
+      </div>
+    </div>
+    <div class="ph-right">
+      <div class="ph-kv"><span id="phFolio">Folio: —</span> <span id="phGen">Generado: —</span></div>
+      <div id="printQR" class="ph-qr"></div>
+    </div>
+  </div>
+
+  <main>
+    <div id="printFolioBar" class="print-folio" aria-hidden="true"></div>
+
+    <section class="card">
+      <h2>0) Datos del médico</h2>
+      <div class="grid">
+        <label>Nombre del médico
+          <input type="text" id="mdName" placeholder="__________________________" />
+        </label>
+        <label>Cédula profesional
+          <input type="text" id="mdLicense" placeholder="__________________________" />
+        </label>
+      </div>
+      <p class="small">Se imprimirán en el PDF (pueden dejarse en blanco para completar a mano).</p>
+    </section>
+
+    <section class="card">
+      <h2>1) Datos del paciente</h2>
+      <form id="patientForm" autocomplete="off">
+        <div class="grid">
+          <label>Nombre / ID
+            <input type="text" id="pxName" placeholder="Paciente..." />
+          </label>
+          <label>Edad (años)
+            <input type="number" id="age" min="16" max="110" step="1" required />
+          </label>
+          <label>Sexo biológico
+            <select id="sex">
+              <option value="M">Masculino</option>
+              <option value="F">Femenino</option>
+            </select>
+          </label>
+          <label>Peso (kg)
+            <input type="number" id="weight" min="30" max="200" step="0.1" required />
+          </label>
+          <label>Creatinina sérica (mg/dL)
+            <input type="number" id="scr" min="0.2" max="10" step="0.01" />
+          </label>
+          <label>TA sistólica (mmHg)
+            <input type="number" id="sbp" min="60" max="260" step="1" />
+          </label>
+          <label>TA diastólica (mmHg)
+            <input type="number" id="dbp" min="30" max="160" step="1" />
+          </label>
+          <label>Saturación O₂ (%)
+            <input type="number" id="spo2" min="50" max="100" step="1" />
+          </label>
+        </div>
+
+        <details>
+          <summary>Factores especiales (expandir)</summary>
+          <div class="grid">
+            <label>Embarazo / Posparto (≤12 sem)
+              <select id="pregnant">
+                <option value="no">No</option>
+                <option value="si">Sí</option>
+              </select>
+            </label>
+            <label>Sospecha de SCAD (disección coronaria espontánea)
+              <select id="scad">
+                <option value="no">No</option>
+                <option value="si">Sí</option>
+              </select>
+            </label>
+            <label>Tiempo previsto hasta PCI primaria (min)
+              <input type="number" id="pciDelay" min="0" max="600" step="1" placeholder="Ej. 150" />
+            </label>
+            <label>Inicio de síntomas (fecha/hora)
+              <input type="datetime-local" id="symptomOnset" />
+            </label>
+          </div>
+        </details>
+
+        <details>
+          <summary>Contraindicaciones absolutas a fibrinólisis</summary>
+          <div class="contra">
+            <label><input type="checkbox" class="absCI" value="HIC previa o lesión vascular intracraneal" /> HIC previa / lesión vascular intracraneal (MAV/aneurisma)</label>
+            <label><input type="checkbox" class="absCI" value="Neoplasia intracraneal conocida" /> Neoplasia intracraneal conocida</label>
+            <label><input type="checkbox" class="absCI" value="EVC isquémico ≤3 meses" /> EVC isquémico ≤3 meses</label>
+            <label><input type="checkbox" class="absCI" value="Disección aórtica sospechada" /> Disección aórtica sospechada</label>
+            <label><input type="checkbox" class="absCI" value="Sangrado activo / diátesis hemorrágica" /> Sangrado activo / diátesis hemorrágica</label>
+            <label><input type="checkbox" class="absCI" value="Trauma craneofacial / neurocirugía reciente" /> Trauma craneofacial / neurocirugía reciente</label>
+            <label><input type="checkbox" class="absCI" value="HTA grave no controlada (>180/110)" /> HTA grave no controlada (&gt;180/110)</label>
+          </div>
+        </details>
+
+        <div class="options">
+          <label><input type="checkbox" id="halfDose75" /> ½ dosis TNK si ≥75 a (según protocolo)</label>
+          <label><input type="checkbox" id="preferUFH" /> Usar heparina no fraccionada (UFH) en lugar de enoxaparina</label>
+        </div>
+
+        <div class="actions">
+          <button type="button" id="generatePlan">Generar plan</button>
+          <button type="button" id="printPlan">Imprimir / PDF</button>
+          <button type="button" id="exportJson">Exportar JSON</button>
+        </div>
+      </form>
+      <p class="disclaimer">Uso clínico bajo protocolo institucional. Herramienta orientativa; confirme siempre dosis, concentraciones y contraindicaciones según norma local.</p>
+    </section>
+
+    <section class="card">
+      <h2>2) Plan calculado</h2>
+      <div id="warnings"></div>
+      <div id="plan"></div>
+    </section>
+
+    <section class="card">
+      <h2>3) Ayuda rápida</h2>
+      <ul class="help">
+        <li><strong>Tenecteplasa (TNK)</strong> bolo IV único (5–10 s): &lt;60 kg: 30 mg · 60–69: 35 mg · 70–79: 40 mg · 80–89: 45 mg · ≥90: 50 mg. Opción ½ dosis si ≥75 a según protocolo.</li>
+        <li><strong>Clopidogrel</strong>: ≤75 a carga 300 mg VO → 75 mg/día; &gt;75 a sin carga → 75 mg/día.</li>
+        <li><strong>Enoxaparina</strong> con líticos:
+          <ul>
+            <li>&lt;75 a, ClCr ≥30: 30 mg IV → a 15 min 1 mg/kg SC c/12 h (2 primeras dosis máx. 100 mg).</li>
+            <li>≥75 a, ClCr ≥30: sin bolo; 0.75 mg/kg SC c/12 h (2 primeras dosis máx. 75 mg).</li>
+            <li>ClCr &lt;30: 1 mg/kg SC c/24 h (evitar bolo IV).</li>
+          </ul>
+        </li>
+        <li><strong>UFH alternativa</strong>: 60 U/kg IV (máx. 4000 U) → infusión 12 U/kg/h (máx. 1000 U/h); ajustar por TTPa.</li>
+        <li><strong>ASA</strong>: carga 162–325 mg (masticable si VO); mantenimiento 75–100 mg/d.</li>
+        <li><strong>EKG 60–90 min</strong>: &darr;ST ≥50% → coronariografía 2–24 h; si fallo → PCI rescate.</li>
+      </ul>
+    </section>
+
+    <section class="card">
+      <h2>4) Notas de evolución</h2>
+      <div class="plan-block">
+        <h3>Inicio de fibrinólisis</h3>
+        <textarea id="evoInicio" class="evo" rows="4" placeholder="Evolución clínica, EKG basal, PA, dolor, etc."></textarea>
+      </div>
+      <div class="plan-block">
+        <h3>Intermedia (60–90 min)</h3>
+        <textarea id="evoIntermedia" class="evo" rows="4" placeholder="Cambios de ST, arritmias de reperfusión, respuesta clínica..."></textarea>
+      </div>
+      <div class="plan-block">
+        <h3>Final (24 h / egreso)</h3>
+        <textarea id="evoFinal" class="evo" rows="4" placeholder="Estado final, complicaciones, PCI realizada, destino..."></textarea>
+      </div>
+    </section>
+  </main>
+
+  <div id="printFooter" class="print-footer" aria-hidden="true">
+    <div class="pf-left">© 2025 SinapsCore a JGRLGA Company • All rigsth reserved • Licencia EULA</div>
+    <div class="pf-right">Pág. <span class="pf-page"></span></div>
+  </div>
+
+  <dialog id="brandDialog">
+    <form method="dialog" class="brand-form">
+      <h3>Branding de SinapsCore</h3>
+      <label>Nombre de la marca
+        <input type="text" id="brandName" placeholder="SinapsCore" />
+      </label>
+      <label>Tagline
+        <input type="text" id="brandTagline" placeholder="Salud Conectada. IA en el Núcleo" />
+      </label>
+      <label>Logo (URL)
+        <input type="url" id="brandLogoURL" placeholder="https://.../logo.png" />
+      </label>
+      <label>Color primario (oro)
+        <input type="color" id="brandPrimary" value="#d4af37" />
+      </label>
+      <label>Color secundario (plata/turquesa)
+        <input type="color" id="brandSecondary" value="#c0c0c0" />
+      </label>
+      <label>Base URL para QR / folio
+        <input type="url" id="brandQRBase" placeholder="https://jgrlga.github.io/JGRLGA-Med-Line/" />
+      </label>
+      <div class="actions">
+        <button value="cancel">Cancelar</button>
+        <button id="saveBrand" value="default">Guardar</button>
+      </div>
+    </form>
+  </dialog>
+
+  <script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
+  <script src="app.js"></script>
+  <script>if('serviceWorker' in navigator){window.addEventListener('load',()=>{navigator.serviceWorker.register('sw.js').catch(()=>{});});}</script>
+</body>
+</html>
