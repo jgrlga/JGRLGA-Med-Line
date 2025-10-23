@@ -1,0 +1,30 @@
+{
+  "name": "SinapsCore · Código Infarto",
+  "short_name": "Código Infarto",
+  "description": "Planificador de fibrinólisis (TNK) con checklist y cálculo de dosis.",
+  "start_url": "/JGRLGA-Med-Line/",
+  "display": "standalone",
+  "background_color": "#0b0e13",
+  "theme_color": "#0b0e13",
+  "icons": [
+    {
+      "src": "apple_touch_icon_180.png",
+      "sizes": "180x180",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "pwa_icon_512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "icon_1024.png",
+      "sizes": "1024x1024",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "scope": "/JGRLGA-Med-Line/"
+}
